@@ -307,8 +307,18 @@ async function setupWallet(ethereum) {
   closeModal();
   try {
     showStatus('Connecting...','info');
-    await ethereum.request({method:'eth_requestAccounts'});
-    try { await ethereum.request({method:'wallet_switchEthereumChain',params:[{chainId:MONAD_CHAIN_ID}]}); } catch(e) { if(e.code===4902) await addMonadNetwork(ethereum); }
+    const accounts = await ethereum.request({method:'eth_requestAccounts'});
+    if(!accounts || accounts.length === 0) { showStatus('No accounts found!','error'); return; }
+    try {
+      await ethereum.request({method:'wallet_switchEthereumChain',params:[{chainId:MONAD_CHAIN_ID}]});
+    } catch(switchErr) {
+      if(switchErr.code === 4902 || switchErr.code === -32603) {
+        try {
+          await ethereum.request({method:'wallet_addEthereumChain',params:[{chainId:MONAD_CHAIN_ID,chainName:'Monad Mainnet',nativeCurrency:{name:'MON',symbol:'MON',decimals:18},rpcUrls:['https://rpc.monad.xyz'],blockExplorerUrls:['https://monad.socialscan.io']}]});
+          await ethereum.request({method:'wallet_switchEthereumChain',params:[{chainId:MONAD_CHAIN_ID}]});
+        } catch(addErr) { showStatus('Add Monad network manually! Chain ID: 143','error'); return; }
+      } else if(switchErr.code === 4001) { showStatus('Switch network rejected!','error'); return; }
+    }
     provider = new ethers.BrowserProvider(ethereum);
     signer = await provider.getSigner();
     userAddress = await signer.getAddress();
@@ -320,9 +330,12 @@ async function setupWallet(ethereum) {
     document.getElementById('walletInfo').classList.add('show');
     document.getElementById('connectBtn').textContent='✓ '+short;
     document.getElementById('buyBtn').disabled=false;
-    showStatus('Wallet connected!','success');
+    showStatus('✅ Wallet connected!','success');
     loadContractData();
-  } catch(e) { showStatus('Connection failed: '+(e.message||e).slice(0,60),'error'); }
+  } catch(e) {
+    if(e.code===4001) { showStatus('Connection rejected by user.','error'); }
+    else { showStatus('Failed: '+(e.message||'unknown').slice(0,60),'error'); }
+  }
 }
 
 async function connectMetaMask() {
