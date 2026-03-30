@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![WINNOWIN](https://raw.githubusercontent.com/00impera/winnowin/main/SEIF_1.png)
+![WINNOWIN](https://raw.githubusercontent.com/00impera/winnowin/master/SEIF_1.png)
 
 **A 4-digit vault cracking game on Monad Mainnet.**  
 Buy a key · Spin the wheel · Crack the code · Win the pool.
@@ -32,8 +32,8 @@ WINNOWIN is an on-chain vault cracking game deployed on **Monad Mainnet**. Playe
 | 💎 **PLATINUM** | 10,000 MON | 4 | Every platinum key purchase |
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/00impera/winnowin/main/SEIF_2.png" width="45%"/>
-<img src="https://raw.githubusercontent.com/00impera/winnowin/main/SEIF_3.png" width="45%"/>
+<img src="https://raw.githubusercontent.com/00impera/winnowin/master/SEIF_2.png" width="45%"/>
+<img src="https://raw.githubusercontent.com/00impera/winnowin/master/SEIF_3.png" width="45%"/>
 </div>
 
 ---
@@ -65,7 +65,7 @@ Pick a vault tier based on your budget:
 - The vault resets for the next round
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/00impera/winnowin/main/SEIF_4.png" width="60%"/>
+<img src="https://raw.githubusercontent.com/00impera/winnowin/master/SEIF_4.png" width="60%"/>
 </div>
 
 ---
@@ -133,9 +133,8 @@ WINNOWIN is a game of skill and chance deployed on a public blockchain. Play res
 
 **WINNOWIN · MONAD MAINNET · 2026**  
 `0x9d5aD64997C26ca505f11fDE71789eb3c664EE60`
-## 🌐 Social Links
 
-<div align="center">
+## 🌐 Social Links
 
 [![Twitter](https://img.shields.io/badge/Twitter-@bnbgold277983-1da1f2?style=for-the-badge&logo=twitter&logoColor=white)](https://x.com/bnbgold277983)
 
@@ -144,6 +143,5 @@ WINNOWIN is a game of skill and chance deployed on a public blockchain. Play res
 [![Telegram](https://img.shields.io/badge/Telegram-Bot-29b6f6?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/eurocoin_monad_bot)
 
 [![MonadVision](https://img.shields.io/badge/Explorer-MonadVision-00ff88?style=for-the-badge)](https://monadvision.com/token/0x9d5aD64997C26ca505f11fDE71789eb3c664EE60)
-
 
 </div>
