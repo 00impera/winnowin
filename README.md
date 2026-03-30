@@ -2,17 +2,15 @@
 
 <div align="center">
 
-![WINNOWIN](https://eurocoin.imperamonad.xyz/logo.png)
+![WINNOWIN](https://raw.githubusercontent.com/00impera/winnowin/main/SEIF_1.png)
 
-### *Crack the code. Win the pool. Claim your NFT.*
+**A 4-digit vault cracking game on Monad Mainnet.**  
+Buy a key · Spin the wheel · Crack the code · Win the pool.
 
-[![Monad](https://img.shields.io/badge/Network-Monad%20Mainnet-00ff88?style=for-the-badge&logo=ethereum&logoColor=black)](https://monad.xyz)
-[![Chain ID](https://img.shields.io/badge/Chain%20ID-143-00c8ff?style=for-the-badge)](https://monad.xyz)
-[![License](https://img.shields.io/badge/License-MIT-c9a84c?style=for-the-badge)](LICENSE)
-[![Twitter](https://img.shields.io/badge/Twitter-@bnbgold277983-1da1f2?style=for-the-badge&logo=twitter&logoColor=white)](https://x.com/bnbgold277983)
-[![Discord](https://img.shields.io/badge/Discord-Join-5865f2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/channels/1316093079090106472)
-
-**[🌐 Live Site](https://winnowin.imperamonad.xyz)** · **[📜 Contract](https://monadvision.com/token/0x9d5aD64997C26ca505f11fDE71789eb3c664EE60)** · **[✈️ Telegram](https://t.me/eurocoin_monad_bot)**
+[![Live App](https://img.shields.io/badge/🌐_Live_App-Play_Now-00ff88?style=for-the-badge)](https://pickkeywinbox1234.nelutz2you.workers.dev/)
+[![Monad Mainnet](https://img.shields.io/badge/Chain-Monad_Mainnet_143-836ef9?style=for-the-badge)](https://monad.xyz)
+[![Contract](https://img.shields.io/badge/Contract-Verified-00c8ff?style=for-the-badge)](https://explorer.monad.xyz/address/0x9d5aD64997C26ca505f11fDE71789eb3c664EE60)
+[![Twitter](https://img.shields.io/badge/Twitter-@bnbgold277983-1da1f2?style=for-the-badge&logo=x)](https://x.com/bnbgold277983)
 
 </div>
 
@@ -20,129 +18,132 @@
 
 ## 🎮 What is WINNOWIN?
 
-**WINNOWIN** is a fully on-chain vault game deployed on **Monad Mainnet**. Players buy keys to attempt cracking a 4-digit vault combination. Every failed attempt adds to the prize pool — the winner takes everything.
-
-> 4 Vaults · 4 Keys · 4 Attempts · 1 Winner
+WINNOWIN is an on-chain vault cracking game deployed on **Monad Mainnet**. Players buy a key to enter a vault, spin the wheel for luck, then try to guess the secret 4-digit code. Crack the vault → win the entire pool of MON + receive a **Winner NFT**.
 
 ---
 
-## 🗝️ How To Play
+## 🏆 The 4 Vaults
 
-| Step | Action |
-|------|--------|
-| **1** | Connect your MetaMask wallet on Monad Mainnet (Chain ID: 143) |
-| **2** | Choose a Key — Bronze, Silver, Gold or Platinum |
-| **3** | Pay the entry fee — MON is added to the vault pool |
-| **4** | Spin the wheel to get started |
-| **5** | Enter your 4-digit combination — you have 4 attempts |
-| **6** | Crack the code → receive the **entire vault pool** + **Winner NFT** |
+| Vault | Key Price | Attempts | Pool Grows With |
+|-------|-----------|----------|-----------------|
+| 🥉 **BRONZE** | 100 MON | 4 | Every bronze key purchase |
+| 🥈 **SILVER** | 500 MON | 4 | Every silver key purchase |
+| 🥇 **GOLD** | 1,000 MON | 4 | Every gold key purchase |
+| 💎 **PLATINUM** | 10,000 MON | 4 | Every platinum key purchase |
 
-### 🔑 Key Types
-
-| Key | Price | Vault | Attempts |
-|-----|-------|-------|----------|
-| 🥉 Bronze Key | 100 MON | Vault 1 | 4 |
-| 🥈 Silver Key | 500 MON | Vault 2 | 4 |
-| 🥇 Gold Key | 1,000 MON | Vault 3 | 4 |
-| 💎 Platinum Key | 10,000 MON | Vault 4 | 4 |
-
-> Every key purchase adds MON to the corresponding vault pool. The pool grows with every player. The winner takes it all.
+<div align="center">
+<img src="https://raw.githubusercontent.com/00impera/winnowin/main/SEIF_2.png" width="45%"/>
+<img src="https://raw.githubusercontent.com/00impera/winnowin/main/SEIF_3.png" width="45%"/>
+</div>
 
 ---
 
-## 📜 Contract Addresses
+## 🕹️ How to Play
 
-| Contract | Address |
-|----------|---------|
-| **WINNOWIN** | [`0x9d5aD64997C26ca505f11fDE71789eb3c664EE60`](https://monadvision.com/token/0x9d5aD64997C26ca505f11fDE71789eb3c664EE60) |
-| **WMON** | `0x2cE8C8F4961a54B2e87585f4178467006B76B418` |
-| **V2Router02** | `0x9269678eAf155eC5bC5f9d089897c889A60C362b` |
-| **V2Factory** | `0x1D05f7Fe52A37f41D3B512b4135057bF3EadEf57` |
+### Step 1 — Connect Wallet
+- Install **MetaMask** (or any EVM wallet)
+- Switch to **Monad Mainnet** · Chain ID: `143`
+- RPC: `https://rpc.monad.xyz`
 
-### Vault Prize Pools (Live)
+### Step 2 — Choose Your Key
+Pick a vault tier based on your budget:
+- Each key purchase adds to that vault's prize pool
+- The pool grows until someone cracks the code
 
-| Vault | Key | Pool |
-|-------|-----|------|
-| 🔐 Vault 1 — Bronze | 100 MON | Live on-chain |
-| 🔐 Vault 2 — Silver | 500 MON | Live on-chain |
-| 🔐 Vault 3 — Gold | 1,000 MON | Live on-chain |
-| 🔐 Vault 4 — Platinum | 10,000 MON | Live on-chain |
+### Step 3 — Spin the Wheel
+- Hit **Spin** for a lucky start
+- The wheel animation sets the mood — and your mindset 🎯
+
+### Step 4 — Enter the 4-Digit Code
+- Click each dial to cycle digits 0–9
+- Build your 4-digit guess
+- You have **4 attempts** per key purchase
+
+### Step 5 — Win!
+- If you guess correctly → the **entire vault pool** is sent to your wallet
+- You also receive a **Winner NFT** minted to your address
+- The vault resets for the next round
+
+<div align="center">
+<img src="https://raw.githubusercontent.com/00impera/winnowin/main/SEIF_4.png" width="60%"/>
+</div>
+
+---
+
+## 📄 Smart Contract
+
+| Field | Value |
+|-------|-------|
+| **Network** | Monad Mainnet |
+| **Chain ID** | 143 |
+| **Contract Address** | `0x9d5aD64997C26ca505f11fDE71789eb3c664EE60` |
+| **Token Standard** | ERC-721 (Winner NFT) |
+| **Verified** | ✅ Sourcify |
+
+### Key Functions
+
+```solidity
+// Buy a key and enter a vault session
+function buyKey(uint256 vaultId, uint8 keyType) payable
+
+// Submit a code guess (4 attempts max)
+function tryUnlock(uint256 code, bytes32 salt) external
+
+// Read vault state
+function getVault(uint256 vaultId) view returns (...)
+
+// Read all pool balances
+function getAllPools() view returns (uint256, uint256, uint256, uint256)
+
+// Read player session
+function getSession(address player) view returns (...)
+```
+
+---
+
+## 🌐 Links
+
+| | |
+|---|---|
+| 🎮 **Play** | [pickkeywinbox1234.nelutz2you.workers.dev](https://pickkeywinbox1234.nelutz2you.workers.dev/) |
+| 🔍 **Explorer** | [explorer.monad.xyz — Contract](https://explorer.monad.xyz/address/0x9d5aD64997C26ca505f11fDE71789eb3c664EE60) |
+| 🐦 **Twitter** | [@bnbgold277983](https://x.com/bnbgold277983) |
+| 💬 **Discord** | [Join Server](https://discord.com/channels/1316093079090106472) |
+| ✈️ **Telegram Bot** | [t.me/eurocoin_monad_bot](https://t.me/eurocoin_monad_bot) |
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| **Blockchain** | Monad Mainnet (Chain ID 143) |
-| **Smart Contract** | Solidity 0.8.24 |
-| **Framework** | Foundry |
-| **Standards** | ERC-721 (Winner NFT) |
-| **Libraries** | OpenZeppelin Contracts |
-| **Metadata** | Base64 encoded on-chain |
-| **Frontend** | HTML · CSS · JavaScript |
-| **Web3** | ethers.js v6 |
-| **Hosting** | GitHub Pages |
-| **DNS** | Porkbun + Cloudflare |
-
-### Smart Contract Features
-- ✅ **ReentrancyGuard** — protected against reentrancy attacks
-- ✅ **Ownable** — owner-controlled vault codes
-- ✅ **On-chain metadata** — Base64 encoded NFT metadata
-- ✅ **4 independent vaults** — each with own prize pool
-- ✅ **Hashed codes** — keccak256(code + salt) verification
-- ✅ **Winner NFT** — minted automatically on vault unlock
+- **Blockchain:** Monad Mainnet (EVM-compatible, Chain ID 143)
+- **Smart Contract:** Solidity ^0.8.24 · OpenZeppelin ERC-721
+- **Frontend:** Vanilla HTML/CSS/JS · ethers.js v6
+- **Hosting:** Cloudflare Workers
+- **Verification:** Sourcify
 
 ---
 
-## 🚀 Deploy
+## ⚠️ Disclaimer
 
-```bash
-# Clone repo
-git clone https://github.com/00impera/winnowin-website.git
-cd winnowin-website
-
-# Deploy contract (Foundry)
-cd winnowin
-forge build
-forge create src/WINNOWIN.sol:WINNOWIN \
-  --rpc-url https://rpc.monad.xyz \
-  --private-key YOUR_PRIVATE_KEY \
-  --broadcast
-
-# Verify contract
-forge verify-contract \
-  --rpc-url https://rpc.monad.xyz \
-  --verifier sourcify \
-  --verifier-url 'https://sourcify-api-monad.blockvision.org/' \
-  --chain-id 143 \
-  CONTRACT_ADDRESS \
-  src/WINNOWIN.sol:WINNOWIN
-```
+WINNOWIN is a game of skill and chance deployed on a public blockchain. Play responsibly. All transactions are irreversible. The contract code is open source and verified on-chain.
 
 ---
 
+<div align="center">
+
+**WINNOWIN · MONAD MAINNET · 2026**  
+`0x9d5aD64997C26ca505f11fDE71789eb3c664EE60`
 ## 🌐 Social Links
 
 <div align="center">
 
 [![Twitter](https://img.shields.io/badge/Twitter-@bnbgold277983-1da1f2?style=for-the-badge&logo=twitter&logoColor=white)](https://x.com/bnbgold277983)
+
 [![Discord](https://img.shields.io/badge/Discord-Join%20Server-5865f2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/channels/1316093079090106472)
+
 [![Telegram](https://img.shields.io/badge/Telegram-Bot-29b6f6?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/eurocoin_monad_bot)
+
 [![MonadVision](https://img.shields.io/badge/Explorer-MonadVision-00ff88?style=for-the-badge)](https://monadvision.com/token/0x9d5aD64997C26ca505f11fDE71789eb3c664EE60)
 
-### 🔗 Related Projects
-
-| Project | Site | Contract |
-|---------|------|----------|
-| 💶 Euro Coin | [eurocoin.imperamonad.xyz](https://eurocoin.imperamonad.xyz) | `0x28b5cc805D90213D2699CC3B00e28e3f0fbeCA8e` |
-| 💎 GemsRock NFT | [gemscoin.imperamonad.xyz](https://gemscoin.imperamonad.xyz) | `0x49931887171BF46922b2b80Aa834537A80C50B70` |
-| 🔐 WINNOWIN | [winnowin.imperamonad.xyz](https://winnowin.imperamonad.xyz) | `0x9d5aD64997C26ca505f11fDE71789eb3c664EE60` |
 
 </div>
-
----
-
-## 📄 License
-
-MIT © 2026 [IMPERIAL INTERNATIONAL](https://imperamonad.xyz) · Built on [Monad Mainnet](https://monad.xyz)
