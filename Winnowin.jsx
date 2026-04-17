@@ -12,8 +12,8 @@ import {
   getContract,
   prepareContractCall,
   readContract,
-  createWallet,
 } from "thirdweb";
+import { createWallet } from "thirdweb/wallets";
 import { useSendTransaction } from "thirdweb/react";
 import { parseEther, formatEther } from "ethers/utils";
 
@@ -177,7 +177,6 @@ async function getNearIntentsQuote({ originAsset, destinationAsset, amount, reci
 }
 
 // ─── CONNECT WALLET BUTTON ────────────────────────────────────────────────────
-// Direct MetaMask connect — no modal flash
 
 function ConnectWalletBtn({ label = "Connect Wallet", className = "btn btn-blue", style = {} }) {
   const { connect, isConnecting } = useConnect();
