@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import {
   ThirdwebProvider,
-  ConnectButton,
   useActiveAccount,
   useActiveWalletChain,
   BuyWidget,
+  useConnect,
 } from "thirdweb/react";
 import {
   createThirdwebClient,
@@ -12,6 +12,7 @@ import {
   getContract,
   prepareContractCall,
   readContract,
+  createWallet,
 } from "thirdweb";
 import { useSendTransaction } from "thirdweb/react";
 import { parseEther, formatEther } from "ethers/utils";
@@ -175,6 +176,41 @@ async function getNearIntentsQuote({ originAsset, destinationAsset, amount, reci
   return res.json();
 }
 
+// ─── CONNECT WALLET BUTTON ────────────────────────────────────────────────────
+// Direct MetaMask connect — no modal flash
+
+function ConnectWalletBtn({ label = "Connect Wallet", className = "btn btn-blue", style = {} }) {
+  const { connect, isConnecting } = useConnect();
+
+  function handleConnect() {
+    connect(async () => {
+      const wallet = createWallet("io.metamask");
+      await wallet.connect({ client, chain: MONAD_MAINNET });
+      return wallet;
+    });
+  }
+
+  return (
+    <button
+      className={className}
+      onClick={handleConnect}
+      disabled={isConnecting}
+      style={{
+        width: "auto",
+        padding: "7px 16px",
+        fontSize: 10,
+        letterSpacing: "1.5px",
+        fontFamily: "'Share Tech Mono', monospace",
+        borderRadius: 20,
+        fontWeight: 700,
+        ...style,
+      }}
+    >
+      {isConnecting ? "CONNECTING…" : label}
+    </button>
+  );
+}
+
 // ─── ROOT EXPORT ──────────────────────────────────────────────────────────────
 
 export default function WinnowinPage() {
@@ -191,10 +227,10 @@ function WinnowinApp() {
   const account     = useActiveAccount();
   const activeChain = useActiveWalletChain();
 
-  const [modalOpen,    setModalOpen]    = useState(false);
-  const [selectedKey,  setSelectedKey]  = useState(0);
-  const [pools,        setPools]        = useState(["—", "—", "—", "—"]);
-  const [bridgeOpen,   setBridgeOpen]   = useState(false);
+  const [modalOpen,   setModalOpen]   = useState(false);
+  const [selectedKey, setSelectedKey] = useState(0);
+  const [pools,       setPools]       = useState(["—", "—", "—", "—"]);
+  const [bridgeOpen,  setBridgeOpen]  = useState(false);
 
   useEffect(() => {
     fetchPools();
@@ -250,12 +286,14 @@ function WinnowinApp() {
               <span className="pulse-dot" />
               MONAD · 143
             </div>
-            <ConnectButton
-              client={client}
-              chain={MONAD_MAINNET}
-              theme="dark"
-              btnTitle="Connect Wallet"
-            />
+            {account ? (
+              <div className="wallet-connected-badge">
+                <span className="pulse-dot green" />
+                {account.address.slice(0, 6)}…{account.address.slice(-4)}
+              </div>
+            ) : (
+              <ConnectWalletBtn label="Connect Wallet" />
+            )}
           </div>
         </header>
 
@@ -406,7 +444,6 @@ function VaultCard({ data, pool, onClick }) {
 }
 
 // ─── BRIDGE MODAL ─────────────────────────────────────────────────────────────
-// Two tabs: Buy with Card (BuyWidget) + NEAR Bridge (swap any chain → MON)
 
 function BridgeModal({ account, onClose }) {
   const [tab,         setTab]        = useState("card");
@@ -437,8 +474,7 @@ function BridgeModal({ account, onClose }) {
     setSwapError(null);
     setSwapQuote(null);
     try {
-      // destination: native MON on Monad via NEAR Intents
-      const destAsset   = "nep141:wrap.near"; // bridge to NEAR then to MON
+      const destAsset   = "nep141:wrap.near";
       const originToken = swapTokens.find((t) => t.assetId === swapOrigin);
       const decimals    = originToken?.decimals ?? 18;
       const amountRaw   = (
@@ -490,7 +526,7 @@ function BridgeModal({ account, onClose }) {
                 <p style={{ color: "var(--text)", fontSize: 12, marginBottom: 16 }}>
                   Connect your wallet first to buy MON with a credit or debit card.
                 </p>
-                <ConnectButton client={client} chain={MONAD_MAINNET} theme="dark" btnTitle="Connect Wallet" />
+                <ConnectWalletBtn label="Connect Wallet" />
               </div>
             ) : (
               <>
@@ -517,7 +553,7 @@ function BridgeModal({ account, onClose }) {
                 <p style={{ color: "var(--text)", fontSize: 12, marginBottom: 16 }}>
                   Connect your wallet to bridge tokens from any chain to MON.
                 </p>
-                <ConnectButton client={client} chain={MONAD_MAINNET} theme="dark" btnTitle="Connect Wallet" />
+                <ConnectWalletBtn label="Connect Wallet" />
               </div>
             ) : (
               <>
@@ -619,13 +655,13 @@ function BridgeModal({ account, onClose }) {
 function VaultModal({ keyIdx, account, onClose, onSuccess }) {
   const key = KEYS[keyIdx];
 
-  const [step,       setStep]       = useState("buy");
-  const [spinning,   setSpinning]   = useState(false);
-  const [spinDeg,    setSpinDeg]    = useState(0);
-  const [dialValues, setDialValues] = useState([0, 0, 0, 0]);
-  const [turnsLeft,  setTurnsLeft]  = useState(4);
-  const [statusMsg,  setStatusMsg]  = useState(null);
-  const [showBuyCard,setShowBuyCard]= useState(false);
+  const [step,        setStep]       = useState("buy");
+  const [spinning,    setSpinning]   = useState(false);
+  const [spinDeg,     setSpinDeg]    = useState(0);
+  const [dialValues,  setDialValues] = useState([0, 0, 0, 0]);
+  const [turnsLeft,   setTurnsLeft]  = useState(4);
+  const [statusMsg,   setStatusMsg]  = useState(null);
+  const [showBuyCard, setShowBuyCard]= useState(false);
 
   const { mutate: sendTx, isPending } = useSendTransaction();
 
@@ -737,23 +773,26 @@ function VaultModal({ keyIdx, account, onClose, onSuccess }) {
               <strong>{Number(key.price).toLocaleString()} MON</strong> and get 4 attempts to crack the vault!
             </p>
 
-            <button
-              className="btn btn-gold"
-              onClick={handleBuyKey}
-              disabled={!account || isPending}
-            >
-              {!account ? "Connect Wallet First" : isPending ? "Sending…" : "◈ Buy Key & Play"}
-            </button>
-
-            {!account && (
-              <div style={{ marginTop: 16 }}>
-                <ConnectButton client={client} chain={MONAD_MAINNET} theme="dark" btnTitle="Connect Wallet" />
+            {!account ? (
+              <div style={{ textAlign: "center" }}>
+                <p style={{ color: "var(--text)", fontSize: 12, marginBottom: 14 }}>
+                  Connect your wallet to play.
+                </p>
+                <ConnectWalletBtn
+                  label="Connect Wallet"
+                  style={{ width: "100%", padding: "14px", fontSize: 12, letterSpacing: "3px", borderRadius: 12, fontFamily: "'Cinzel', serif", fontWeight: 700 }}
+                />
               </div>
-            )}
+            ) : (
+              <>
+                <button
+                  className="btn btn-gold"
+                  onClick={handleBuyKey}
+                  disabled={isPending}
+                >
+                  {isPending ? "Sending…" : "◈ Buy Key & Play"}
+                </button>
 
-            {/* Buy MON with card inline */}
-            {account && (
-              <div style={{ marginTop: 4 }}>
                 <button
                   className="btn btn-card"
                   onClick={() => setShowBuyCard((v) => !v)}
@@ -769,7 +808,7 @@ function VaultModal({ keyIdx, account, onClose, onSuccess }) {
                     />
                   </div>
                 )}
-              </div>
+              </>
             )}
 
             {statusMsg && <StatusBox msg={statusMsg} />}
@@ -1034,7 +1073,17 @@ body::before {
   width: 7px; height: 7px; background: var(--green);
   border-radius: 50%; animation: pulse 2s infinite; box-shadow: 0 0 8px var(--green);
 }
+.pulse-dot.green { background: var(--green); box-shadow: 0 0 8px var(--green); }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* WALLET CONNECTED BADGE */
+.wallet-connected-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(0,255,136,0.08); border: 1px solid rgba(0,255,136,0.3);
+  border-radius: 20px; padding: 7px 16px;
+  font-size: 10px; color: var(--green); letter-spacing: 1px;
+  font-family: 'Share Tech Mono', monospace;
+}
 
 /* GET MON HEADER BUTTON */
 .bridge-header-btn {
