@@ -13,7 +13,7 @@ import {
   readContract,
 } from "thirdweb";
 import { useSendTransaction } from "thirdweb/react";
-import { parseEther, formatEther } from "ethers";
+import { parseEther, formatEther } from "ethers/utils";
 
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
 
