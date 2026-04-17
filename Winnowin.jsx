@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import {
   ThirdwebProvider,
+  ConnectButton,
   useActiveAccount,
   useActiveWalletChain,
   BuyWidget,
-  useConnect,
 } from "thirdweb/react";
 import {
   createThirdwebClient,
@@ -13,7 +13,6 @@ import {
   prepareContractCall,
   readContract,
 } from "thirdweb";
-import { createWallet } from "thirdweb/wallets";
 import { useSendTransaction } from "thirdweb/react";
 import { parseEther, formatEther } from "ethers/utils";
 
@@ -176,45 +175,20 @@ async function getNearIntentsQuote({ originAsset, destinationAsset, amount, reci
   return res.json();
 }
 
-// ─── CONNECT WALLET BUTTON ────────────────────────────────────────────────────
-// FIX 1: Guard against missing MetaMask before attempting connection.
-// Without this check, the SDK throws "MetaMask extension not found" and
-// triggers a flood of "Could not establish connection" runtime errors.
+// ─── SHARED CONNECT BUTTON ────────────────────────────────────────────────────
+// Single source of truth — uses thirdweb's ConnectButton which handles
+// MetaMask, WalletConnect, Coinbase, embedded wallets, and the
+// "wallet not installed" case automatically. No manual window.ethereum check needed.
 
-function ConnectWalletBtn({ label = "Connect Wallet", className = "btn btn-blue", style = {} }) {
-  const { connect, isConnecting } = useConnect();
-
-  function handleConnect() {
-    // If MetaMask is not installed, open the download page instead of crashing.
-    if (!window.ethereum || !window.ethereum.isMetaMask) {
-      window.open("https://metamask.io/download/", "_blank", "noopener,noreferrer");
-      return;
-    }
-    connect(async () => {
-      const wallet = createWallet("io.metamask");
-      await wallet.connect({ client, chain: MONAD_MAINNET });
-      return wallet;
-    });
-  }
-
+function WalletButton({ style = {} }) {
   return (
-    <button
-      className={className}
-      onClick={handleConnect}
-      disabled={isConnecting}
-      style={{
-        width: "auto",
-        padding: "7px 16px",
-        fontSize: 10,
-        letterSpacing: "1.5px",
-        fontFamily: "'Share Tech Mono', monospace",
-        borderRadius: 20,
-        fontWeight: 700,
-        ...style,
-      }}
-    >
-      {isConnecting ? "CONNECTING…" : label}
-    </button>
+    <ConnectButton
+      client={client}
+      chain={MONAD_MAINNET}
+      theme="dark"
+      btnTitle="Connect Wallet"
+      style={style}
+    />
   );
 }
 
@@ -294,12 +268,14 @@ function WinnowinApp() {
               MONAD · 143
             </div>
             {account ? (
-              <div className="wallet-connected-badge">
-                <span className="pulse-dot green" />
-                {account.address.slice(0, 6)}…{account.address.slice(-4)}
-              </div>
+              // When connected, ConnectButton renders as an account menu (disconnect, switch chain, etc.)
+              <ConnectButton
+                client={client}
+                chain={MONAD_MAINNET}
+                theme="dark"
+              />
             ) : (
-              <ConnectWalletBtn label="Connect Wallet" />
+              <WalletButton />
             )}
           </div>
         </header>
@@ -533,7 +509,7 @@ function BridgeModal({ account, onClose }) {
                 <p style={{ color: "var(--text)", fontSize: 12, marginBottom: 16 }}>
                   Connect your wallet first to buy MON with a credit or debit card.
                 </p>
-                <ConnectWalletBtn label="Connect Wallet" />
+                <WalletButton />
               </div>
             ) : (
               <>
@@ -560,7 +536,7 @@ function BridgeModal({ account, onClose }) {
                 <p style={{ color: "var(--text)", fontSize: 12, marginBottom: 16 }}>
                   Connect your wallet to bridge tokens from any chain to MON.
                 </p>
-                <ConnectWalletBtn label="Connect Wallet" />
+                <WalletButton />
               </div>
             ) : (
               <>
@@ -616,7 +592,7 @@ function BridgeModal({ account, onClose }) {
                     </div>
                     <div className="bq-row">
                       <span>You Receive (est.)</span>
-                      <span>{swapQuote.amountOutFormatted ?? "—"} MON</span>
+                      <span>{swapQuote.amountOutFormatted ?? swapQuote.minAmountOut ?? "—"} MON</span>
                     </div>
                     <div className="bq-row">
                       <span>Deadline</span>
@@ -785,9 +761,12 @@ function VaultModal({ keyIdx, account, onClose, onSuccess }) {
                 <p style={{ color: "var(--text)", fontSize: 12, marginBottom: 14 }}>
                   Connect your wallet to play.
                 </p>
-                <ConnectWalletBtn
-                  label="Connect Wallet"
-                  style={{ width: "100%", padding: "14px", fontSize: 12, letterSpacing: "3px", borderRadius: 12, fontFamily: "'Cinzel', serif", fontWeight: 700 }}
+                {/* ConnectButton handles all wallet detection and errors */}
+                <ConnectButton
+                  client={client}
+                  chain={MONAD_MAINNET}
+                  theme="dark"
+                  btnTitle="Connect Wallet"
                 />
               </div>
             ) : (
@@ -931,7 +910,7 @@ function WheelSVG() {
 
 function HowToPlay() {
   const steps = [
-    ["1", "Connect Wallet",  "MetaMask on Monad Mainnet · Chain ID 143"],
+    ["1", "Connect Wallet",  "MetaMask, Coinbase, WalletConnect or any injected wallet on Monad Mainnet · Chain ID 143"],
     ["2", "Get MON",         "Buy with card or bridge from any chain via NEAR Intents"],
     ["3", "Choose a Key",    "Bronze 100 · Silver 500 · Gold 1,000 · Platinum 10,000 MON"],
     ["4", "Spin the Wheel",  "Spin to get your starting combination"],
@@ -957,10 +936,6 @@ function HowToPlay() {
 }
 
 // ─── RAIN CANVAS ──────────────────────────────────────────────────────────────
-// FIX 3: Reduced drops 120→60 and removed per-frame shadowBlur toggling.
-// shadowBlur on canvas is extremely expensive and was causing the 627ms
-// setTimeout violation. Glow effect is preserved via a static CSS filter
-// on the canvas element instead.
 
 function RainCanvas() {
   const canvasRef = useRef(null);
@@ -971,7 +946,6 @@ function RainCanvas() {
     function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     resize();
     window.addEventListener("resize", resize);
-    // Halved drop count; removed shadowBlur (the main perf offender).
     const drops = Array.from({ length: 60 }, () => ({
       x: Math.random() * window.innerWidth,
       y: Math.random() * window.innerHeight,
@@ -990,7 +964,6 @@ function RainCanvas() {
         ctx.strokeStyle = d.color;
         ctx.globalAlpha = d.alpha;
         ctx.lineWidth = d.width;
-        // shadowBlur removed — was the primary cause of the 627ms violation.
         ctx.stroke();
         d.y += d.speed;
         if (d.y > canvas.height) { d.y = -d.len; d.x = Math.random() * canvas.width; }
@@ -1008,7 +981,6 @@ function RainCanvas() {
         position: "fixed", top: 0, left: 0,
         width: "100%", height: "100%",
         zIndex: 0, pointerEvents: "none", opacity: 0.18,
-        // CSS filter replaces the removed canvas shadowBlur with near-zero CPU cost.
         filter: "blur(0.6px) brightness(1.3)",
       }}
     />
@@ -1057,7 +1029,6 @@ body::before {
   padding: 20px 16px 60px;
 }
 
-/* HEADER */
 .header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 18px 24px; margin-bottom: 24px;
@@ -1085,21 +1056,8 @@ body::before {
   width: 7px; height: 7px; background: var(--green);
   border-radius: 50%; animation: pulse 2s infinite; box-shadow: 0 0 8px var(--green);
 }
-.pulse-dot.green { background: var(--green); box-shadow: 0 0 8px var(--green); }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-/* WALLET CONNECTED BADGE */
-.wallet-connected-badge {
-  display: inline-flex; align-items: center; gap: 7px;
-  background: rgba(0,255,136,0.08); border: 1px solid rgba(0,255,136,0.3);
-  border-radius: 20px; padding: 7px 16px;
-  font-size: 10px; color: var(--green); letter-spacing: 1px;
-  font-family: 'Share Tech Mono', monospace;
-}
-
-/* GET MON HEADER BUTTON */
-/* FIX 2: Slowed vibrate from 0.12s → 0.3s to eliminate the 627ms
-   setTimeout handler violation caused by too-frequent repaints. */
 .bridge-header-btn {
   background: linear-gradient(135deg, #003a5a, var(--blue));
   border: none; border-radius: 20px;
@@ -1120,7 +1078,6 @@ body::before {
   color: #ff8844; font-size: 12px; text-align: center; letter-spacing: 1px;
 }
 
-/* HERO */
 .hero { text-align: center; padding: 40px 20px 20px; }
 .hero-title {
   font-family: 'Cinzel', serif; font-size: clamp(40px, 8vw, 80px); font-weight: 900;
@@ -1134,7 +1091,6 @@ body::before {
   background: linear-gradient(90deg, transparent, var(--blue), transparent);
 }
 
-/* CONTRACT BAR */
 .contract-bar {
   background: var(--card); border: 1px solid var(--border);
   border-radius: 12px; padding: 12px 20px; margin: 0 0 24px;
@@ -1149,14 +1105,12 @@ body::before {
 }
 .copy-btn:hover { border-color: var(--blue); }
 
-/* SECTION TITLE */
 .section-title {
   font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: 4px;
   color: var(--gold); text-transform: uppercase;
   margin: 28px 0 14px; text-align: center;
 }
 
-/* KEY CARDS */
 .keys-grid {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 14px; margin-bottom: 28px;
@@ -1196,7 +1150,6 @@ body::before {
 .key-turns  { font-size: 9px; color: #2a6a8a; letter-spacing: 1px; }
 .key-pool   { font-size: 11px; color: var(--gold2); margin-top: 8px; padding: 6px; background: #040e18; border-radius: 8px; }
 
-/* VAULT CARDS */
 .vaults-grid {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 18px; margin-bottom: 28px;
@@ -1226,7 +1179,6 @@ body::before {
 .vault-pool-label { font-size: 9px; color: #2a6a8a; letter-spacing: 2px; text-transform: uppercase; }
 .vault-status.locked { display: inline-block; margin-top: 6px; padding: 3px 10px; border-radius: 10px; font-size: 9px; letter-spacing: 1px; background: #1a0808; border: 1px solid #ff4444; color: #ff4444; }
 
-/* HOW TO PLAY */
 .howto { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 22px; margin: 20px 0; }
 .steps { display: flex; flex-direction: column; gap: 12px; margin-top: 14px; }
 .step  { display: flex; gap: 14px; align-items: flex-start; }
@@ -1234,7 +1186,6 @@ body::before {
 .step-text { font-size: 11px; line-height: 1.7; padding-top: 3px; }
 .step-text strong { color: var(--gold2); display: block; margin-bottom: 1px; letter-spacing: 1px; }
 
-/* FOOTER */
 .footer { text-align: center; padding: 28px 0 0; border-top: 1px solid var(--border); }
 .footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-bottom: 16px; }
 .footer-link {
@@ -1266,7 +1217,6 @@ body::before {
 .fl-dc:hover     { box-shadow: 0 0 24px #9b84ec66; }
 .footer-copy { font-size: 9px; color: #0a2a3a; letter-spacing: 2px; word-break: break-word; }
 
-/* MODAL SHARED */
 .modal-overlay {
   position: fixed; inset: 0;
   background: rgba(0,4,8,0.92); z-index: 100;
@@ -1299,11 +1249,8 @@ body::before {
 @keyframes floatImg { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 .modal-title { font-family: 'Cinzel', serif; font-size: 17px; color: var(--gold); letter-spacing: 3px; margin-bottom: 20px; }
 
-/* BRIDGE MODAL SPECIFICS */
 .bridge-modal { max-width: 480px; }
-.bridge-tabs {
-  display: flex; gap: 8px; margin-bottom: 20px;
-}
+.bridge-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
 .bridge-tab {
   flex: 1; padding: 10px; border-radius: 10px;
   font-family: 'Share Tech Mono', monospace; font-size: 10px;
@@ -1348,19 +1295,16 @@ body::before {
   background: rgba(201,168,76,0.06); border: 1px solid rgba(201,168,76,0.3);
 }
 
-/* BUY WIDGET WRAPPER */
 .buy-widget-wrap {
   border-radius: 12px; overflow: hidden;
   border: 1px solid rgba(0,200,255,0.2);
   background: rgba(5,10,14,0.95);
 }
 
-/* VAULT MODAL STEP */
 .step-section { display: flex; flex-direction: column; gap: 14px; }
 .step-desc { font-size: 12px; color: var(--text); line-height: 1.8; }
 .step-desc strong { color: var(--gold); }
 
-/* BUTTONS */
 .btn {
   width: 100%; padding: 14px; border: none; border-radius: 12px;
   font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700;
@@ -1373,20 +1317,19 @@ body::before {
 .btn-blue:not(:disabled):hover  { transform: translateY(-2px); box-shadow: 0 8px 25px #00c8ff44; }
 .btn-green { background: linear-gradient(135deg, #003a20, var(--green)); color: #000; }
 .btn-green:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 8px 25px #00ff8844; }
-.btn-card  { background: linear-gradient(135deg, #3a2a00, #c9a84c); color: #000;
+.btn-card  {
+  background: linear-gradient(135deg, #3a2a00, #c9a84c); color: #000;
   width: 100%; padding: 12px; border: none; border-radius: 12px;
   font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
   letter-spacing: 2px; cursor: pointer; transition: all 0.3s; text-transform: uppercase;
 }
 .btn-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px #c9a84c55; }
 
-/* STATUS BOX */
 .status-box { padding: 10px; border-radius: 8px; font-size: 10px; letter-spacing: 1px; }
 .status-box.info    { background: #00c8ff11; border: 1px solid #00c8ff44; color: var(--blue); }
 .status-box.success { background: #00ff8811; border: 1px solid #00ff8844; color: var(--green); }
 .status-box.error   { background: #ff004411; border: 1px solid #ff004444; color: #ff4466; }
 
-/* WHEEL */
 .wheel-wrap { position: relative; width: 240px; height: 240px; margin: 0 auto 18px; }
 .wheel-pointer {
   position: absolute; top: -16px; left: 50%; transform: translateX(-50%);
@@ -1402,7 +1345,6 @@ body::before {
 }
 .wheel-inner { width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, #040e18, #020810); }
 
-/* DIALS */
 .turns-box { margin-bottom: 12px; }
 .turns-left { font-size: 32px; font-weight: 700; color: var(--gold); font-family: 'Cinzel', serif; }
 .turns-label { font-size: 9px; color: #2a6a8a; letter-spacing: 2px; }
@@ -1417,7 +1359,6 @@ body::before {
 }
 .dial:hover { border-color: var(--blue); transform: scale(1.08); color: var(--green); text-shadow: 0 0 20px var(--green); }
 
-/* WIN TEXT */
 .win-text { font-family: 'Cinzel', serif; font-size: 24px; font-weight: 900; color: var(--gold); letter-spacing: 4px; text-shadow: 0 0 20px var(--gold); }
 
 @media (max-width: 600px) {
