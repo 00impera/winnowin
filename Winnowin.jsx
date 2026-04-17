@@ -177,11 +177,19 @@ async function getNearIntentsQuote({ originAsset, destinationAsset, amount, reci
 }
 
 // ─── CONNECT WALLET BUTTON ────────────────────────────────────────────────────
+// FIX 1: Guard against missing MetaMask before attempting connection.
+// Without this check, the SDK throws "MetaMask extension not found" and
+// triggers a flood of "Could not establish connection" runtime errors.
 
 function ConnectWalletBtn({ label = "Connect Wallet", className = "btn btn-blue", style = {} }) {
   const { connect, isConnecting } = useConnect();
 
   function handleConnect() {
+    // If MetaMask is not installed, open the download page instead of crashing.
+    if (!window.ethereum || !window.ethereum.isMetaMask) {
+      window.open("https://metamask.io/download/", "_blank", "noopener,noreferrer");
+      return;
+    }
     connect(async () => {
       const wallet = createWallet("io.metamask");
       await wallet.connect({ client, chain: MONAD_MAINNET });
@@ -949,6 +957,10 @@ function HowToPlay() {
 }
 
 // ─── RAIN CANVAS ──────────────────────────────────────────────────────────────
+// FIX 3: Reduced drops 120→60 and removed per-frame shadowBlur toggling.
+// shadowBlur on canvas is extremely expensive and was causing the 627ms
+// setTimeout violation. Glow effect is preserved via a static CSS filter
+// on the canvas element instead.
 
 function RainCanvas() {
   const canvasRef = useRef(null);
@@ -959,7 +971,8 @@ function RainCanvas() {
     function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     resize();
     window.addEventListener("resize", resize);
-    const drops = Array.from({ length: 120 }, () => ({
+    // Halved drop count; removed shadowBlur (the main perf offender).
+    const drops = Array.from({ length: 60 }, () => ({
       x: Math.random() * window.innerWidth,
       y: Math.random() * window.innerHeight,
       speed: 1.5 + Math.random() * 4,
@@ -977,10 +990,8 @@ function RainCanvas() {
         ctx.strokeStyle = d.color;
         ctx.globalAlpha = d.alpha;
         ctx.lineWidth = d.width;
-        ctx.shadowColor = d.color;
-        ctx.shadowBlur = 6;
+        // shadowBlur removed — was the primary cause of the 627ms violation.
         ctx.stroke();
-        ctx.shadowBlur = 0;
         d.y += d.speed;
         if (d.y > canvas.height) { d.y = -d.len; d.x = Math.random() * canvas.width; }
       });
@@ -997,6 +1008,8 @@ function RainCanvas() {
         position: "fixed", top: 0, left: 0,
         width: "100%", height: "100%",
         zIndex: 0, pointerEvents: "none", opacity: 0.18,
+        // CSS filter replaces the removed canvas shadowBlur with near-zero CPU cost.
+        filter: "blur(0.6px) brightness(1.3)",
       }}
     />
   );
@@ -1085,6 +1098,8 @@ body::before {
 }
 
 /* GET MON HEADER BUTTON */
+/* FIX 2: Slowed vibrate from 0.12s → 0.3s to eliminate the 627ms
+   setTimeout handler violation caused by too-frequent repaints. */
 .bridge-header-btn {
   background: linear-gradient(135deg, #003a5a, var(--blue));
   border: none; border-radius: 20px;
@@ -1092,7 +1107,7 @@ body::before {
   color: #000; font-family: 'Share Tech Mono', monospace; font-weight: 700;
   cursor: pointer; transition: all 0.2s;
   box-shadow: 0 0 12px #00c8ff44;
-  animation: vibrate 0.12s linear infinite;
+  animation: vibrate 0.3s linear infinite;
 }
 .bridge-header-btn:hover {
   animation: none; transform: scale(1.08);
@@ -1227,7 +1242,7 @@ body::before {
   font-size: 10px; letter-spacing: 1.5px; text-decoration: none;
   padding: 8px 16px; border-radius: 20px;
   font-family: 'Share Tech Mono', monospace; font-weight: 700;
-  cursor: pointer; animation: vibrate 0.12s linear infinite;
+  cursor: pointer; animation: vibrate 0.3s linear infinite;
   transition: box-shadow 0.2s, transform 0.2s;
 }
 .footer-link:hover { animation: none; transform: scale(1.1); }
